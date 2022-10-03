@@ -116,7 +116,8 @@ namespace ModTools.Utils
                     if (memberName.IndexOf("vehicle", StringComparison.OrdinalIgnoreCase) >= 0 ||
                         memberName.IndexOf("cargo", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        return SmartType.Vehicle;
+                        if (type == typeof(ushort))
+                            return SmartType.Vehicle;
                     }
 
                     if (memberName.IndexOf("buildingNode", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -151,17 +152,20 @@ namespace ModTools.Utils
 
                     if (memberName.IndexOf("node", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        return SmartType.NetNode;
+                        if (type == typeof(ushort))
+                            return SmartType.NetNode;
                     }
 
                     if (memberName.IndexOf("segment", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        return SmartType.NetSegment;
+                        if (type == typeof(ushort))
+                            return SmartType.NetSegment;
                     }
 
                     if (memberName.IndexOf("lane", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        return SmartType.NetLane;
+                        if (type == typeof(uint))
+                            return SmartType.NetLane;
                     }
 
                     if (memberName.IndexOf("park", StringComparison.OrdinalIgnoreCase) >= 0)
