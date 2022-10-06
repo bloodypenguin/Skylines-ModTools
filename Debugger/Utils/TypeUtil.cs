@@ -72,7 +72,7 @@ namespace ModTools.Utils
         public static bool IsBitmaskEnum(Type t) => t.IsDefined(typeof(FlagsAttribute), false);
 
         public static ExtendedMemberInfo[] GetAllMembers(Type type, bool recursive = false)
-            => GetMembersInternal(type, recursive, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+            => GetMembersInternal(type, recursive, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
         public static void ClearTypeCache() => typeCache = new Dictionary<Type, ExtendedMemberInfo[]>();
 
