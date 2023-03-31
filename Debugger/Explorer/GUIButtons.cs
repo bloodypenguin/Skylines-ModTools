@@ -573,6 +573,38 @@ namespace ModTools.Explorer
                         break;
                     }
 
+                    case TypeUtil.SmartType.DisasterData:
+                    {
+                        if (Convert.ToUInt16(value) < 1)
+                        {
+                            return;
+                        }
+
+                        if (GUILayout.Button("Show disaster data"))
+                        {
+                            var sceneExplorer = Object.FindObjectOfType<SceneExplorer>();
+                            sceneExplorer.Show(ReferenceChainBuilder.ForDisasterData(Convert.ToUInt16(value)));
+                        }
+
+                        break;
+                    }
+
+                    case TypeUtil.SmartType.EventData:
+                    {
+                        if (Convert.ToUInt16(value) < 1)
+                        {
+                            return;
+                        }
+
+                        if (GUILayout.Button("Show event data"))
+                        {
+                            var sceneExplorer = Object.FindObjectOfType<SceneExplorer>();
+                            sceneExplorer.Show(ReferenceChainBuilder.ForEventData(Convert.ToUInt16(value)));
+                        }
+
+                        break;
+                    }
+
                     default:
                         return;
                 }

@@ -31,6 +31,8 @@ namespace ModTools.Utils
             Undefined,
             Sprite,
             ZoneBlock,
+            EventData,
+            DisasterData
         }
 
         public static Type FindTypeByFullName(string fullName)
@@ -106,9 +108,21 @@ namespace ModTools.Utils
                     memberName.IndexOf("type", StringComparison.OrdinalIgnoreCase) < 0 &&
                     memberName.IndexOf("flags", StringComparison.OrdinalIgnoreCase) < 0 &&
                     memberName.IndexOf("offset", StringComparison.OrdinalIgnoreCase) < 0 &&
+                    memberName.IndexOf("probability", StringComparison.OrdinalIgnoreCase) < 0 &&
+                    memberName.IndexOf("cooldown", StringComparison.OrdinalIgnoreCase) < 0 &&
                     IsIntegerType(type))
                 {
-                    if (memberName.IndexOf("parkedVehicle", StringComparison.OrdinalIgnoreCase) >= 0)
+                    if (memberName.IndexOf("event", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        return SmartType.EventData;
+                    }
+
+                    if (memberName.IndexOf("disaster", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        return SmartType.DisasterData;
+                    }
+
+                    if (memberName.IndexOf("parked", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         return SmartType.ParkedVehicle;
                     }

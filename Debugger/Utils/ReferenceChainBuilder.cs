@@ -185,6 +185,26 @@ namespace ModTools.Utils
                 .Add(treeId);
         }
 
+        public static ReferenceChain ForEventData(ushort eventId)
+        {
+            return new ReferenceChain()
+                .Add(EventManager.instance.gameObject)
+                .Add(EventManager.instance)
+                .Add(typeof(EventManager).GetField("m_events"))
+                .Add(typeof(FastList<EventData>).GetField("m_buffer"))
+                .Add(eventId);
+        }
+
+        public static ReferenceChain ForDisasterData(ushort disasterId)
+        {
+            return new ReferenceChain()
+                .Add(DisasterManager.instance.gameObject)
+                .Add(DisasterManager.instance)
+                .Add(typeof(DisasterManager).GetField("m_disasters"))
+                .Add(typeof(FastList<DisasterData>).GetField("m_buffer"))
+                .Add(disasterId);
+        }
+
         public static ReferenceChain ForSprite(string value) // TODO add support for other atlases other than the default one
         {
             var id = (uint)UIView.GetAView().defaultAtlas.sprites.FindIndex(sprite => sprite.name == value);
