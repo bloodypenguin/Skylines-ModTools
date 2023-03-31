@@ -46,7 +46,8 @@
     <Reference Include="ICities" />
     <Reference Include="UnityEngine" />
     <Reference Include="ObjUnity3D">
-      <Private>true</Private>
+      <HintPath>.\lib\ObjUnity3D.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

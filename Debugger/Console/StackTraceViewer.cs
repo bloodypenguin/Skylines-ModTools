@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Linq;
 using ModTools.UI;
-using ObjUnity3D;
 using UnityEngine;
 
 namespace ModTools.Console
@@ -75,7 +74,7 @@ namespace ModTools.Console
                 GUI.contentColor = Color.white;
             }
 
-            if (stackFrames.Length > 0 && !errorMessage.IsNullOrEmpty())
+            if (stackFrames.Length > 0 && !string.IsNullOrEmpty(errorMessage))
             {
                 GUILayout.BeginHorizontal(GUI.skin.box);
                 GUI.contentColor = Config.ConsoleErrorColor;

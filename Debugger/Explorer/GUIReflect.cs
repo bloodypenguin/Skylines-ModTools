@@ -1,8 +1,7 @@
-﻿using ModTools.Utils;
-using ObjUnity3D;
-using System;
+﻿using System;
 using System.Collections;
 using System.Reflection;
+using ModTools.Utils;
 using UnityEngine;
 
 namespace ModTools.Explorer {
@@ -73,7 +72,7 @@ namespace ModTools.Explorer {
             var matchingMembers = 0;
             foreach (var member in members) {
                 var filterMatchFrom = -1;
-                if (!filter.IsNullOrEmpty() && (filterMatchFrom = member.ReflectionInfo.Name.IndexOf(filter, StringComparison.OrdinalIgnoreCase)) < 0) {
+                if (!string.IsNullOrEmpty(filter) && (filterMatchFrom = member.ReflectionInfo.Name.IndexOf(filter, StringComparison.OrdinalIgnoreCase)) < 0) {
                     continue;
                 }
 
@@ -151,7 +150,7 @@ namespace ModTools.Explorer {
                 }
             }
 
-            if (filter.IsNullOrEmpty() || members.Length <= 0 || matchingMembers != 0) {
+            if (string.IsNullOrEmpty(filter) || members.Length <= 0 || matchingMembers != 0) {
                 return;
             }
 
