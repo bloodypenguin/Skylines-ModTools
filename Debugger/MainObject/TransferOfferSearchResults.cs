@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ColossalFramework;
@@ -10,12 +11,12 @@ namespace ModTools.MainObject
         private static GameObject thisGameObject;
 
         private InstanceID m_instanceID;
-        private TransferManager.TransferOffer[] m_outgoingOffers;
-        private TransferManager.TransferOffer[] m_incomingOffers;
+        private SearchResult[] m_outgoingOffers;
+        private SearchResult[] m_incomingOffers;
 
-        public TransferManager.TransferOffer[] IncomingOffers() => m_incomingOffers;
+        public SearchResult[] IncomingOffers() => m_incomingOffers;
 
-        public TransferManager.TransferOffer[] OutgoingOffers() => m_outgoingOffers;
+        public SearchResult[] OutgoingOffers() => m_outgoingOffers;
 
         public InstanceID InstanceID => m_instanceID;
 
@@ -58,10 +59,38 @@ namespace ModTools.MainObject
                         BindingFlags.Instance | BindingFlags.NonPublic)
                     .GetValue(TransferManager.instance);
             m_instanceID = instanceID;
-            m_outgoingOffers = outgoingOffers
-                .Where(offer => offer.Amount > 0 && offer.m_object == instanceID).ToArray();
-            m_incomingOffers = incomingOffers
-                .Where(offer => offer.Amount > 0 && offer.m_object == instanceID).ToArray();
+            var list = new List<SearchResult>();
+            for (uint index = 0; index < outgoingOffers.Length; index++)
+            {
+                var offer = outgoingOffers[index];
+                if (offer.m_object == instanceID) list.Add(new SearchResult(index, offer));
+            }
+
+            m_outgoingOffers = list.ToArray();
+            var list1 = new List<SearchResult>();
+            for (uint index = 0; index < incomingOffers.Length; index++)
+            {
+                var offer = incomingOffers[index];
+                if (offer.m_object == instanceID) list1.Add(new SearchResult(index, offer));
+            }
+
+            m_incomingOffers = list1.ToArray();
+        }
+
+        public struct SearchResult
+        {
+            private TransferManager.TransferOffer transferOffer;
+            private uint valueIndex;
+
+            public SearchResult(uint valueIndex, TransferManager.TransferOffer transferOffer)
+            {
+                this.valueIndex = valueIndex;
+                this.transferOffer = transferOffer;
+            }
+
+            public TransferManager.TransferOffer TransferOffer => transferOffer;
+
+            public uint ValueIndex => valueIndex;
         }
     }
 }
