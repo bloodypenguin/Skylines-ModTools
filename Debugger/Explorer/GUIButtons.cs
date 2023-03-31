@@ -14,8 +14,163 @@ namespace ModTools.Explorer
 
         private static object buffer;
 
+
+        public static ReferenceChain SetupShortcutButtons(ReferenceChain refChain, object value, uint valueIndex)
+        {
+            switch (value)
+            {
+                case null:
+                    return null;
+                case VehicleInfo:
+                    if (GUILayout.Button(Ai))
+                    {
+                        return refChain.Add(typeof(VehicleInfo).GetField(nameof(VehicleInfo.m_vehicleAI)));
+                    }
+
+                    break;
+
+                case BuildingInfo:
+                    if (GUILayout.Button(Ai))
+                    {
+                        return refChain.Add(typeof(BuildingInfo).GetField(nameof(BuildingInfo.m_buildingAI)));
+                    }
+
+                    break;
+
+                case CitizenInfo:
+                    if (GUILayout.Button(Ai))
+                    {
+                        return refChain.Add(typeof(CitizenInfo).GetField(nameof(CitizenInfo.m_citizenAI)));
+                    }
+
+                    break;
+
+                case DisasterInfo:
+                    if (GUILayout.Button(Ai))
+                    {
+                        return refChain.Add(typeof(DisasterInfo).GetField(nameof(DisasterInfo.m_disasterAI)));
+                    }
+
+                    break;
+
+                case EventInfo:
+                    if (GUILayout.Button(Ai))
+                    {
+                        return refChain.Add(typeof(EventInfo).GetField(nameof(EventInfo.m_eventAI)));
+                    }
+
+                    break;
+
+                case NetInfo:
+                    if (GUILayout.Button(Ai))
+                    {
+                        return refChain.Add(typeof(NetInfo).GetField(nameof(NetInfo.m_netAI)));
+                    }
+
+                    break;
+                case CitizenInstance instance
+                    when valueIndex > 0 &&
+                         (instance.m_flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) ==
+                         CitizenInstance.Flags.Created:
+
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(CitizenInstance).GetProperty(nameof(CitizenInstance.Info)));
+                    }
+
+                    break;
+
+                case Vehicle vehicle when valueIndex > 0 &&
+                                          (vehicle.m_flags & (Vehicle.Flags.Created | Vehicle.Flags.Deleted)) ==
+                                          Vehicle.Flags.Created:
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(Vehicle).GetProperty(nameof(vehicle.Info)));
+                    }
+
+                    break;
+
+                case VehicleParked parkedVehicle when valueIndex > 0 && (parkedVehicle.m_flags & 3) == 1:
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(VehicleParked).GetProperty(nameof(VehicleParked.Info)));
+                    }
+
+                    break;
+
+                case Building building when valueIndex > 0 &&
+                                            (building.m_flags & (Building.Flags.Created | Building.Flags.Deleted)) ==
+                                            Building.Flags.Created:
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(Building).GetProperty(nameof(Building.Info)));
+                    }
+
+                    break;
+
+                case PropInstance prop when valueIndex > 0 &&
+                                            ((PropInstance.Flags)prop.m_flags & (PropInstance.Flags.Created | PropInstance.Flags.Deleted)) ==
+                                            PropInstance.Flags.Created:
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(PropInstance).GetProperty(nameof(PropInstance.Info)));
+                    }
+
+                    break;
+
+                case TreeInstance tree when valueIndex > 0 &&
+                                            ((TreeInstance.Flags)tree.m_flags & (TreeInstance.Flags.Created | TreeInstance.Flags.Deleted)) ==
+                                            TreeInstance.Flags.Created:
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(TreeInstance).GetProperty(nameof(TreeInstance.Info)));
+                    }
+
+                    break;
+
+                case NetSegment segment when valueIndex > 0 &&
+                                             (segment.m_flags &
+                                              (NetSegment.Flags.Created | NetSegment.Flags.Deleted)) ==
+                                             NetSegment.Flags.Created:
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(NetSegment).GetProperty(nameof(NetSegment.Info)));
+                    }
+
+                    break;
+
+                case NetNode node when valueIndex > 0 &&
+                                       (node.m_flags & (NetNode.Flags.Created | NetNode.Flags.Deleted)) ==
+                                       NetNode.Flags.Created:
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(NetNode).GetProperty(nameof(NetNode.Info)));
+                    }
+
+                    break;
+
+                case EventData:
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(EventData).GetProperty(nameof(EventData.Info)));
+                    }
+
+                    break;
+
+                case DisasterData:
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(DisasterData).GetProperty(nameof(DisasterData.Info)));
+                    }
+
+                    break;
+            }
+
+            return null;
+        }
+
         // returns the new reference chain to show. Null if nothing to show
-        public static ReferenceChain SetupCommonButtons(ReferenceChain refChain, object value, uint valueIndex, TypeUtil.SmartType smartType = TypeUtil.SmartType.Undefined)
+        public static void SetupCommonButtons(ReferenceChain refChain, object value, uint valueIndex, TypeUtil.SmartType smartType = TypeUtil.SmartType.Undefined)
         {
             switch (value)
             {
@@ -25,60 +180,7 @@ namespace ModTools.Explorer
                         MainWindow.Instance.Watches.AddWatch(refChain);
                     }
 
-                    return null;
-                case VehicleInfo vehicleInfo:
-                    if (GUILayout.Button(Ai))
-                    {
-                        return refChain.Add(typeof(VehicleInfo).GetField(nameof(VehicleInfo.m_vehicleAI)));
-                    }
-
-                    SetupButtonsForPrefab(vehicleInfo);
-                    break;
-
-                case BuildingInfo buildingInfo:
-                    if (GUILayout.Button(Ai))
-                    {
-                        return refChain.Add(typeof(BuildingInfo).GetField(nameof(BuildingInfo.m_buildingAI)));
-                    }
-
-                    SetupButtonsForPrefab(buildingInfo);
-                    break;
-
-                case CitizenInfo citizenInfo:
-                    if (GUILayout.Button(Ai))
-                    {
-                        return refChain.Add(typeof(CitizenInfo).GetField(nameof(CitizenInfo.m_citizenAI)));
-                    }
-
-                    SetupButtonsForPrefab(citizenInfo);
-                    break;
-
-                case DisasterInfo disasterInfo:
-                    if (GUILayout.Button(Ai))
-                    {
-                        return refChain.Add(typeof(DisasterInfo).GetField(nameof(DisasterInfo.m_disasterAI)));
-                    }
-
-                    SetupButtonsForPrefab(disasterInfo);
-                    break;
-
-                case EventInfo eventInfo:
-                    if (GUILayout.Button(Ai))
-                    {
-                        return refChain.Add(typeof(EventInfo).GetField(nameof(EventInfo.m_eventAI)));
-                    }
-
-                    SetupButtonsForPrefab(eventInfo);
-                    break;
-
-                case NetInfo netInfo:
-                    if (GUILayout.Button(Ai))
-                    {
-                        return refChain.Add(typeof(NetInfo).GetField(nameof(NetInfo.m_netAI)));
-                    }
-
-                    SetupButtonsForPrefab(netInfo);
-                    break;
+                    return;
 
                 case PrefabInfo prefabInfo:
                     SetupButtonsForPrefab(prefabInfo);
@@ -147,10 +249,6 @@ namespace ModTools.Explorer
                     InstanceID vehicleInst = default;
                     vehicleInst.Vehicle = (ushort)valueIndex;
                     SetupGotoButton(vehicleInst, vehicle.GetLastFramePosition());
-                    if (GUILayout.Button(Info))
-                    {
-                        return refChain.Add(typeof(Vehicle).GetProperty(nameof(vehicle.Info)));
-                    }
 
                     break;
 
@@ -158,10 +256,6 @@ namespace ModTools.Explorer
                     InstanceID parkedVehicleInst = default;
                     parkedVehicleInst.ParkedVehicle = (ushort)valueIndex;
                     SetupGotoButton(parkedVehicleInst, parkedVehicle.m_position);
-                    if (GUILayout.Button(Info))
-                    {
-                        return refChain.Add(typeof(VehicleParked).GetProperty(nameof(VehicleParked.Info)));
-                    }
 
                     break;
 
@@ -171,10 +265,6 @@ namespace ModTools.Explorer
                     InstanceID buildingInst = default;
                     buildingInst.Building = (ushort)valueIndex;
                     SetupGotoButton(buildingInst, building.m_position);
-                    if (GUILayout.Button(Info))
-                    {
-                        return refChain.Add(typeof(Building).GetProperty(nameof(Building.Info)));
-                    }
 
                     break;
 
@@ -184,10 +274,6 @@ namespace ModTools.Explorer
                     InstanceID propInst = default;
                     propInst.Prop = (ushort)valueIndex;
                     SetupGotoButton(propInst, prop.Position);
-                    if (GUILayout.Button(Info))
-                    {
-                        return refChain.Add(typeof(PropInstance).GetProperty(nameof(PropInstance.Info)));
-                    }
 
                     break;
 
@@ -197,10 +283,6 @@ namespace ModTools.Explorer
                     InstanceID treeInst = default;
                     treeInst.Tree = valueIndex;
                     SetupGotoButton(treeInst, tree.Position);
-                    if (GUILayout.Button(Info))
-                    {
-                        return refChain.Add(typeof(TreeInstance).GetProperty(nameof(TreeInstance.Info)));
-                    }
 
                     break;
 
@@ -212,10 +294,6 @@ namespace ModTools.Explorer
                     segmentInst.NetSegment = (ushort)valueIndex;
                     SetupANButton(segmentInst);
                     SetupGotoButton(segmentInst, segment.m_middlePosition);
-                    if (GUILayout.Button(Info))
-                    {
-                        return refChain.Add(typeof(NetSegment).GetProperty(nameof(NetSegment.Info)));
-                    }
 
                     break;
 
@@ -226,10 +304,6 @@ namespace ModTools.Explorer
                     nodeInst.NetNode = (ushort)valueIndex;
                     SetupANButton(nodeInst);
                     SetupGotoButton(nodeInst, node.m_position);
-                    if (GUILayout.Button(Info))
-                    {
-                        return refChain.Add(typeof(NetNode).GetProperty(nameof(NetNode.Info)));
-                    }
 
                     break;
 
@@ -241,22 +315,6 @@ namespace ModTools.Explorer
                     segmentInst1.NetSegment = lane.m_segment;
                     var segment1 = NetManager.instance.m_segments.m_buffer[lane.m_segment];
                     SetupGotoButton(segmentInst1, segment1.m_middlePosition);
-                    break;
-
-                case EventData:
-                    if (GUILayout.Button(Info))
-                    {
-                        return refChain.Add(typeof(EventData).GetProperty(nameof(EventData.Info)));
-                    }
-
-                    break;
-
-                case DisasterData:
-                    if (GUILayout.Button(Info))
-                    {
-                        return refChain.Add(typeof(DisasterData).GetProperty(nameof(DisasterData.Info)));
-                    }
-
                     break;
 
                 case Texture texture:
@@ -323,8 +381,6 @@ namespace ModTools.Explorer
             {
                 buffer = value;
             }
-
-            return null;
         }
 
         public static void SetupSmartShowButtons(object value, TypeUtil.SmartType smartType)

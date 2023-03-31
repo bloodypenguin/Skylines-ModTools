@@ -403,7 +403,9 @@ namespace ModTools.Explorer
                         Show(state.CurrentRefChain.SubChain(state.CurrentRefChain.Length - 1), false);
                     }
 
-                    var newReferenceChain = GUIButtons.SetupCommonButtons(state.CurrentRefChain, value, state.CurrentRefChain.LastItem is uint u ? u : 0);
+                    var valueIndex = state.CurrentRefChain.LastItem is uint u ? u : 0;
+                    GUIButtons.SetupCommonButtons(state.CurrentRefChain, value, valueIndex);
+                    var newReferenceChain = GUIButtons.SetupShortcutButtons(state.CurrentRefChain, value, valueIndex);
                     if (newReferenceChain != null)
                     {
                         Show(newReferenceChain);
