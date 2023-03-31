@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using ColossalFramework.UI;
+using ModTools.MainObject;
 using ModTools.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -19,8 +21,6 @@ namespace ModTools.Explorer
         {
             switch (value)
             {
-                case null:
-                    return null;
                 case VehicleInfo:
                     if (GUILayout.Button(Ai))
                     {
@@ -73,6 +73,15 @@ namespace ModTools.Explorer
                          (instance.m_flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) ==
                          CitizenInstance.Flags.Created:
 
+                    var instanceID3 = new InstanceID
+                    {
+                        Citizen = CitizenManager.instance.m_instances.m_buffer[valueIndex].m_citizen,
+                    };
+                    if (SetupFindTransferOffersButton(instanceID3) is { } result3)
+                    {
+                        return result3;
+                    }
+
                     if (GUILayout.Button(Info))
                     {
                         return refChain.Add(typeof(CitizenInstance).GetProperty(nameof(CitizenInstance.Info)));
@@ -83,6 +92,15 @@ namespace ModTools.Explorer
                 case Vehicle vehicle when valueIndex > 0 &&
                                           (vehicle.m_flags & (Vehicle.Flags.Created | Vehicle.Flags.Deleted)) ==
                                           Vehicle.Flags.Created:
+                    var instanceID1 = new InstanceID
+                    {
+                        Vehicle = (ushort)valueIndex,
+                    };
+                    if (SetupFindTransferOffersButton(instanceID1) is { } result1)
+                    {
+                        return result1;
+                    }
+
                     if (GUILayout.Button(Info))
                     {
                         return refChain.Add(typeof(Vehicle).GetProperty(nameof(vehicle.Info)));
@@ -101,6 +119,15 @@ namespace ModTools.Explorer
                 case Building building when valueIndex > 0 &&
                                             (building.m_flags & (Building.Flags.Created | Building.Flags.Deleted)) ==
                                             Building.Flags.Created:
+                    var instanceID2 = new InstanceID
+                    {
+                        Building = (ushort)valueIndex,
+                    };
+                    if (SetupFindTransferOffersButton(instanceID2) is { } result2)
+                    {
+                        return result2;
+                    }
+
                     if (GUILayout.Button(Info))
                     {
                         return refChain.Add(typeof(Building).GetProperty(nameof(Building.Info)));
@@ -132,6 +159,15 @@ namespace ModTools.Explorer
                                              (segment.m_flags &
                                               (NetSegment.Flags.Created | NetSegment.Flags.Deleted)) ==
                                              NetSegment.Flags.Created:
+                    var instanceID4 = new InstanceID
+                    {
+                        NetSegment = (ushort)valueIndex,
+                    };
+                    if (SetupFindTransferOffersButton(instanceID4) is { } result4)
+                    {
+                        return result4;
+                    }
+
                     if (GUILayout.Button(Info))
                     {
                         return refChain.Add(typeof(NetSegment).GetProperty(nameof(NetSegment.Info)));
@@ -161,6 +197,14 @@ namespace ModTools.Explorer
                     if (GUILayout.Button(Info))
                     {
                         return refChain.Add(typeof(DisasterData).GetProperty(nameof(DisasterData.Info)));
+                    }
+
+                    break;
+
+                case TransferOfferSearchResults transferOfferSearchResults:
+                    if (SetupFindTransferOffersButton(transferOfferSearchResults.InstanceID) is { } result5)
+                    {
+                        return result5;
                     }
 
                     break;
@@ -982,6 +1026,19 @@ namespace ModTools.Explorer
             {
                 ToolsModifierControl.cameraController.SetTarget(instance, position, true);
             }
+        }
+
+        private static ReferenceChain SetupFindTransferOffersButton(InstanceID instanceID)
+        {
+            if (!GUILayout.Button("Find offers"))
+            {
+                return null;
+            }
+
+            TransferOfferSearchResults.instance.Find(instanceID);
+            return new ReferenceChain()
+                .Add(TransferOfferSearchResults.instance.gameObject)
+                .Add(TransferOfferSearchResults.instance);
         }
 
         private static void SetupANButton(InstanceID instance) {

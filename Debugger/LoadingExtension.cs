@@ -69,7 +69,7 @@ namespace ModTools {
             TypeUtil.ClearTypeCache();
             ShaderUtil.ClearShaderCache();
             CustomPrefabs.Revert();
-            TransferSearchResults.Revert();
+            TransferOfferSearchResults.Revert();
         }
     }
 }
