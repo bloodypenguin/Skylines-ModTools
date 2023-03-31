@@ -403,7 +403,12 @@ namespace ModTools.Explorer
                         Show(state.CurrentRefChain.SubChain(state.CurrentRefChain.Length - 1), false);
                     }
 
-                    GUIButtons.SetupCommonButtons(state.CurrentRefChain, value, state.CurrentRefChain.LastItem is uint u ? u : 0);
+                    var newReferenceChain = GUIButtons.SetupCommonButtons(state.CurrentRefChain, value, state.CurrentRefChain.LastItem is uint u ? u : 0);
+                    if (newReferenceChain != null)
+                    {
+                        Show(newReferenceChain);
+                    }
+
                     GUILayout.FlexibleSpace();
                     GUILayout.EndHorizontal();
                 }

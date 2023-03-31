@@ -9,9 +9,13 @@ namespace ModTools.Explorer
 {
     internal static class GUIButtons
     {
+        private const string Info = "Info";
+        private const string Ai = "AI";
+
         private static object buffer;
 
-        public static void SetupCommonButtons(ReferenceChain refChain, object value, uint valueIndex, TypeUtil.SmartType smartType = TypeUtil.SmartType.Undefined)
+        // returns the new reference chain to show. Null if nothing to show
+        public static ReferenceChain SetupCommonButtons(ReferenceChain refChain, object value, uint valueIndex, TypeUtil.SmartType smartType = TypeUtil.SmartType.Undefined)
         {
             switch (value)
             {
@@ -21,7 +25,7 @@ namespace ModTools.Explorer
                         MainWindow.Instance.Watches.AddWatch(refChain);
                     }
 
-                    return;
+                    return null;
 
                 case PrefabInfo prefabInfo:
                     SetupButtonsForPrefab(prefabInfo);
@@ -90,12 +94,22 @@ namespace ModTools.Explorer
                     InstanceID vehicleInst = default;
                     vehicleInst.Vehicle = (ushort)valueIndex;
                     SetupGotoButton(vehicleInst, vehicle.GetLastFramePosition());
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(Vehicle).GetProperty(Info));
+                    }
+
                     break;
 
                 case VehicleParked parkedVehicle when valueIndex > 0 && (parkedVehicle.m_flags & 3) == 1:
                     InstanceID parkedVehicleInst = default;
                     parkedVehicleInst.ParkedVehicle = (ushort)valueIndex;
                     SetupGotoButton(parkedVehicleInst, parkedVehicle.m_position);
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(VehicleParked).GetProperty(Info));
+                    }
+
                     break;
 
                 case Building building when valueIndex > 0 &&
@@ -104,6 +118,11 @@ namespace ModTools.Explorer
                     InstanceID buildingInst = default;
                     buildingInst.Building = (ushort)valueIndex;
                     SetupGotoButton(buildingInst, building.m_position);
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(Building).GetProperty(Info));
+                    }
+
                     break;
 
                 case PropInstance prop when valueIndex > 0 &&
@@ -112,6 +131,11 @@ namespace ModTools.Explorer
                     InstanceID propInst = default;
                     propInst.Prop = (ushort)valueIndex;
                     SetupGotoButton(propInst, prop.Position);
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(PropInstance).GetProperty(Info));
+                    }
+
                     break;
 
                 case TreeInstance tree when valueIndex > 0 &&
@@ -120,6 +144,11 @@ namespace ModTools.Explorer
                     InstanceID treeInst = default;
                     treeInst.Tree = valueIndex;
                     SetupGotoButton(treeInst, tree.Position);
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(TreeInstance).GetProperty(Info));
+                    }
+
                     break;
 
                 case NetSegment segment when valueIndex > 0 &&
@@ -130,6 +159,11 @@ namespace ModTools.Explorer
                     segmentInst.NetSegment = (ushort)valueIndex;
                     SetupANButton(segmentInst);
                     SetupGotoButton(segmentInst, segment.m_middlePosition);
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(NetSegment).GetProperty(Info));
+                    }
+
                     break;
 
                 case NetNode node when valueIndex > 0 &&
@@ -139,6 +173,11 @@ namespace ModTools.Explorer
                     nodeInst.NetNode = (ushort)valueIndex;
                     SetupANButton(nodeInst);
                     SetupGotoButton(nodeInst, node.m_position);
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(NetNode).GetProperty(Info));
+                    }
+
                     break;
 
                 case NetLane lane when valueIndex > 0 &&
@@ -178,6 +217,8 @@ namespace ModTools.Explorer
             {
                 buffer = value;
             }
+
+            return null;
         }
 
         public static void SetupSmartShowButtons(object value, TypeUtil.SmartType smartType)
