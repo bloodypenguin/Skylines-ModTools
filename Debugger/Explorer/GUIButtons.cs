@@ -149,7 +149,7 @@ namespace ModTools.Explorer
                     SetupGotoButton(vehicleInst, vehicle.GetLastFramePosition());
                     if (GUILayout.Button(Info))
                     {
-                        return refChain.Add(typeof(Vehicle).GetProperty(Info));
+                        return refChain.Add(typeof(Vehicle).GetProperty(nameof(vehicle.Info)));
                     }
 
                     break;
@@ -160,7 +160,7 @@ namespace ModTools.Explorer
                     SetupGotoButton(parkedVehicleInst, parkedVehicle.m_position);
                     if (GUILayout.Button(Info))
                     {
-                        return refChain.Add(typeof(VehicleParked).GetProperty(Info));
+                        return refChain.Add(typeof(VehicleParked).GetProperty(nameof(VehicleParked.Info)));
                     }
 
                     break;
@@ -173,7 +173,7 @@ namespace ModTools.Explorer
                     SetupGotoButton(buildingInst, building.m_position);
                     if (GUILayout.Button(Info))
                     {
-                        return refChain.Add(typeof(Building).GetProperty(Info));
+                        return refChain.Add(typeof(Building).GetProperty(nameof(Building.Info)));
                     }
 
                     break;
@@ -186,7 +186,7 @@ namespace ModTools.Explorer
                     SetupGotoButton(propInst, prop.Position);
                     if (GUILayout.Button(Info))
                     {
-                        return refChain.Add(typeof(PropInstance).GetProperty(Info));
+                        return refChain.Add(typeof(PropInstance).GetProperty(nameof(PropInstance.Info)));
                     }
 
                     break;
@@ -199,7 +199,7 @@ namespace ModTools.Explorer
                     SetupGotoButton(treeInst, tree.Position);
                     if (GUILayout.Button(Info))
                     {
-                        return refChain.Add(typeof(TreeInstance).GetProperty(Info));
+                        return refChain.Add(typeof(TreeInstance).GetProperty(nameof(TreeInstance.Info)));
                     }
 
                     break;
@@ -214,7 +214,7 @@ namespace ModTools.Explorer
                     SetupGotoButton(segmentInst, segment.m_middlePosition);
                     if (GUILayout.Button(Info))
                     {
-                        return refChain.Add(typeof(NetSegment).GetProperty(Info));
+                        return refChain.Add(typeof(NetSegment).GetProperty(nameof(NetSegment.Info)));
                     }
 
                     break;
@@ -228,7 +228,7 @@ namespace ModTools.Explorer
                     SetupGotoButton(nodeInst, node.m_position);
                     if (GUILayout.Button(Info))
                     {
-                        return refChain.Add(typeof(NetNode).GetProperty(Info));
+                        return refChain.Add(typeof(NetNode).GetProperty(nameof(NetNode.Info)));
                     }
 
                     break;
@@ -241,6 +241,22 @@ namespace ModTools.Explorer
                     segmentInst1.NetSegment = lane.m_segment;
                     var segment1 = NetManager.instance.m_segments.m_buffer[lane.m_segment];
                     SetupGotoButton(segmentInst1, segment1.m_middlePosition);
+                    break;
+
+                case EventData:
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(EventData).GetProperty(nameof(EventData.Info)));
+                    }
+
+                    break;
+
+                case DisasterData:
+                    if (GUILayout.Button(Info))
+                    {
+                        return refChain.Add(typeof(DisasterData).GetProperty(nameof(DisasterData.Info)));
+                    }
+
                     break;
 
                 case Texture texture:
