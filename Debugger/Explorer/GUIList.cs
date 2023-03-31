@@ -8,14 +8,9 @@ namespace ModTools.Explorer
 {
     internal static class GUIList
     {
-        public static void OnSceneTreeReflectIList(SceneExplorerState state, ReferenceChain refChain, object myProperty, TypeUtil.SmartType elementSmartType = TypeUtil.SmartType.Undefined)
+        public static void OnSceneTreeReflectIList(SceneExplorerState state, ReferenceChain refChain, IList list, TypeUtil.SmartType elementSmartType = TypeUtil.SmartType.Undefined)
         {
             if (!SceneExplorerCommon.SceneTreeCheckDepth(refChain))
-            {
-                return;
-            }
-
-            if (!(myProperty is IList list))
             {
                 return;
             }
@@ -34,10 +29,8 @@ namespace ModTools.Explorer
             }
 
             var listItemType = list.GetType().GetElementType();
-            var flagsField = listItemType?.GetField("m_flags");
-            var flagIsEnum = flagsField?.FieldType.IsEnum == true && Type.GetTypeCode(flagsField.FieldType) == TypeCode.Int32;
 
-            GUICollectionNavigation.SetUpCollectionNavigation("List", state, refChain, oldRefChain, collectionSize, out var arrayStart, out var arrayEnd);
+            GUICollectionNavigation.SetUpCollectionNavigation("List", state, refChain, oldRefChain, (uint)collectionSize, out var arrayStart, out var arrayEnd);
             for (var i = arrayStart; i <= arrayEnd; i++)
             {
                 refChain = oldRefChain.Add(i);
@@ -47,12 +40,17 @@ namespace ModTools.Explorer
 
                 GUI.contentColor = Color.white;
 
-                var value = list[(int)i];
+                object value = null;
+                try {
+                    value = list[(int)i];
+                } catch (IndexOutOfRangeException ex) {
+                    Logger.Error($"list.Count={list.Count} index={i} collectionSize={collectionSize} arrayEnd={arrayEnd}\n" + ex);
+                }
+
                 var type = value?.GetType() ?? listItemType;
-                var isNullOrEmpty = value == null || flagIsEnum && Convert.ToInt32(flagsField.GetValue(value)) == 0;
                 if (type != null)
                 {
-                    if (!isNullOrEmpty)
+                    if (value != null)
                     {
                         GUIExpander.ExpanderControls(state, refChain, type);
                     }
@@ -72,25 +70,21 @@ namespace ModTools.Explorer
 
                 GUI.contentColor = MainWindow.Instance.Config.ValueColor;
 
-                GUILayout.Label(value == null ? "null" : isNullOrEmpty ? "empty" : value.ToString());
+                GUILayout.Label(value?.ToString() ?? "null");
 
                 GUI.contentColor = Color.white;
 
                 GUILayout.FlexibleSpace();
 
-                if (!isNullOrEmpty)
-                {
-                    GUIButtons.SetupCommonButtons(refChain, value, i, elementSmartType);
-                }
-
                 if (value != null)
                 {
+                    GUIButtons.SetupCommonButtons(refChain, value, i, elementSmartType);
                     GUIButtons.SetupJumpButton(value, refChain);
                 }
 
                 GUILayout.EndHorizontal();
 
-                if (!isNullOrEmpty && !TypeUtil.IsSpecialType(type) && state.ExpandedObjects.Contains(refChain.UniqueId))
+                if (value != null && !TypeUtil.IsSpecialType(type) && state.ExpandedObjects.Contains(refChain.UniqueId))
                 {
                     GUIReflect.OnSceneTreeReflect(state, refChain, value, false);
                 }

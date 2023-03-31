@@ -110,7 +110,7 @@
             bool mouseOverAWindow = IsMouseOverAWindow();
             modalUI.Update(mouseOverAWindow, middleButtonState);
 
-            if (!LoadingExtension.Loaded || mouseOverAWindow /* workaround: when mouse is over a window UUI update is not exected. */) {
+            if (!LoadingExtension.Loaded || mouseOverAWindow || UIView.HasModalInput() /* workaround: when mouse is over a window UUI update is not expected. */) {
                 HandleHotKeys();
             }
         }
@@ -121,17 +121,17 @@
                 // prevent double trigger by UUI when mouse is at the place window will be visible.
                 return;
             }
-            if (SettingsUI.ConsoleKey.IsKeyUp()) {
+            if (SettingsUI.ConsoleKey.KeyActivated()) {
                 ToggleConsole();
-            } else if (SettingsUI.MainWindowKey.IsKeyUp()) {
+            } else if (SettingsUI.MainWindowKey.KeyActivated()) {
                 ToggleMainWindow();
-            } else if (SettingsUI.SceneExplorerKey.IsKeyUp()) {
+            } else if (SettingsUI.SceneExplorerKey.KeyActivated()) {
                 ToggleSceneExplorer();
-            } else if (SettingsUI.DebugRendererKey.IsKeyUp()) {
+            } else if (SettingsUI.DebugRendererKey.KeyActivated()) {
                 ToggleDebugRenderer();
-            } else if (SettingsUI.WatchesKey.IsKeyUp()) {
+            } else if (SettingsUI.WatchesKey.KeyActivated()) {
                 ToggleWatches();
-            } else if (SettingsUI.ScriptEditorKey.IsKeyUp()) {
+            } else if (SettingsUI.ScriptEditorKey.KeyActivated()) {
                 ToggleScriptEditor();
             }
         }
@@ -143,13 +143,13 @@
             UUIHelpers.RegisterHotkeys(activationKey: SettingsUI.WatchesKey, onToggle: ToggleWatches);
             UUIHelpers.RegisterHotkeys(activationKey: SettingsUI.ScriptEditorKey, onToggle: ToggleScriptEditor);
 
-            Dictionary<SavedInputKey, Func<bool>> InDebugRendererKeys = new Dictionary<SavedInputKey, Func<bool>>();
-            InDebugRendererKeys[SettingsUI.IterateComponentKey] = InDebugRenderer;
-            InDebugRendererKeys[SettingsUI.ShowComponentKey] = InDebugRenderer;
+            Dictionary<SavedInputKey, Func<bool>> inDebugRendererKeys = new Dictionary<SavedInputKey, Func<bool>>();
+            inDebugRendererKeys[SettingsUI.IterateComponentKey] = DebugRendererIntoolHotkeysActive;
+            inDebugRendererKeys[SettingsUI.ShowComponentKey] = DebugRendererIntoolHotkeysActive;
             UUIHelpers.RegisterHotkeys(
                 activationKey: SettingsUI.DebugRendererKey,
                 onToggle: ToggleDebugRenderer,
-                activeKeys: InDebugRendererKeys);
+                activeKeys: inDebugRendererKeys);
         }
 
         private void ToggleConsole() {
@@ -175,6 +175,8 @@
         }
 
         private bool InDebugRenderer() => debugRenderer?.DrawDebugInfo ?? false;
+
+        private bool DebugRendererIntoolHotkeysActive() => InDebugRenderer() && debugRenderer.IntoolkeysActrive;
         #endregion HotKeys
 
         protected override void OnWindowDestroyed()

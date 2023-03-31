@@ -37,43 +37,48 @@ namespace ModTools.Explorer
                 Debug.LogException(e);
             }
 
+            if (SceneExplorer.FirstFrame) {
+                return; // avoid exceptions (cached values might change after fist call to GetValue() of a property)
+            }
+
             if (value != null)
             {
                 GUIExpander.ExpanderControls(state, refChain, field.FieldType);
             }
 
-            if (field.IsInitOnly)
+            if (!field.CanWrie())
             {
                 GUI.enabled = false;
             }
 
-            if (MainWindow.Instance.Config.ShowModifiers)
-            {
-                GUI.contentColor = MainWindow.Instance.Config.ModifierColor;
+            if (MainWindow.Instance.Config.ShowModifiers) {
+                try {
+                    GUI.contentColor = MainWindow.Instance.Config.MemberTypeColor;
+                    //GUILayout.Label("field ");
 
-                if (field.IsPublic)
-                {
-                    GUILayout.Label("public ");
-                }
-                else if (field.IsPrivate)
-                {
-                    GUILayout.Label("private ");
-                }
+                    {
+                        GUI.contentColor = MainWindow.Instance.Config.ModifierColor;
+                        string modifiers = field.GetAccessmodifier().ToString2();
+                        if (!string.IsNullOrEmpty(modifiers)) {
+                            GUILayout.Label(modifiers + " ");
+                        }
+                    }
 
-                GUI.contentColor = MainWindow.Instance.Config.MemberTypeColor;
+                    {
+                        GUI.contentColor = MainWindow.Instance.Config.MemberTypeColor;
+                        string modifiers = field.GetTypeModifier().ToString2();
+                        if (field.HasReadOnlyModifier()) {
+                            modifiers = ModifierUtil.ConcatWithSpace(modifiers, "readonly");
+                        }
 
-                GUILayout.Label("field ");
-
-                if (field.IsStatic)
-                {
-                    GUI.contentColor = MainWindow.Instance.Config.KeywordColor;
-                    GUILayout.Label("static ");
-                }
-
-                if (field.IsInitOnly)
-                {
-                    GUI.contentColor = MainWindow.Instance.Config.KeywordColor;
-                    GUILayout.Label("const ");
+                        if (!string.IsNullOrEmpty(modifiers)) {
+                            GUILayout.Label(modifiers + " ");
+                        }
+                    }
+                } catch (Exception ex) {
+                    Logger.Exception(ex);
+                    GUI.contentColor = MainWindow.Instance.Config.ModifierColor;
+                    GUILayout.Label(ex.GetType().Name + " ");
                 }
             }
 
@@ -97,6 +102,7 @@ namespace ModTools.Explorer
                     var newValue = GUIControls.EditorValueField(refChain.UniqueId, field.FieldType, value);
                     if (!newValue.Equals(value))
                     {
+                        UnityEngine.Debug.Log($"setting '{obj}'.'{field}' to '{value}' ...");
                         refChain.SetValue(obj, field, newValue);
                     }
                 }
@@ -113,7 +119,7 @@ namespace ModTools.Explorer
 
             GUIButtons.SetupCommonButtons(refChain, value, valueIndex: 0, smartType);
             object paste = null;
-            var doPaste = !field.IsLiteral && !field.IsInitOnly;
+            var doPaste = field.CanWrie();
             if (doPaste)
             {
                 doPaste = GUIButtons.SetupPasteButon(field.FieldType, value, out paste);

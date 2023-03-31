@@ -7,14 +7,9 @@ namespace ModTools.Explorer
 {
     internal static class GUIEnumerable
     {
-        public static void OnSceneTreeReflectIEnumerable(SceneExplorerState state, ReferenceChain refChain, object myProperty, TypeUtil.SmartType elementSmartType = TypeUtil.SmartType.Undefined)
+        public static void OnSceneTreeReflectIEnumerable(SceneExplorerState state, ReferenceChain refChain, IEnumerable enumerable, TypeUtil.SmartType elementSmartType = TypeUtil.SmartType.Undefined)
         {
             if (!SceneExplorerCommon.SceneTreeCheckDepth(refChain))
-            {
-                return;
-            }
-
-            if (!(myProperty is IEnumerable enumerable))
             {
                 return;
             }

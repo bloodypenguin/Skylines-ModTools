@@ -1,5 +1,5 @@
 ﻿#if DEBUG
-namespace ModTools 
+namespace ModTools
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -8,7 +8,7 @@ namespace ModTools
     using UnityEngine.SceneManagement;
 
     /// <summary>
-    /// Dummy class to help store values for debuging purposes.
+    /// Dummy class to help store values for debugging purposes.
     /// </summary>
     public class Test : MonoBehaviour
     {
@@ -26,9 +26,9 @@ namespace ModTools
         public List<NetInfo.Node> Nodes = new List<NetInfo.Node>();
         public ICollection<NetInfo.Node> Nodes2;
         public IEnumerable<NetInfo.Node> Nodes3;
-        public NetInfo.Node[] Nodes4 = new NetInfo.Node[100];
+        public NetInfo.Node[] Nodes4 = new NetInfo.Node[5];
         public int[] IntArray = new int[10];
-        public NetNode[] NetNodeArray = new NetNode[10];
+        public NetNode[] NetNodeArray = new NetNode[5];
 
         public float f = 1.1f;
         public int i = -1;
@@ -51,7 +51,7 @@ namespace ModTools
 
         public Test()
         {
-            for (int i = 0; i < 100; ++i)
+            for (int i = 0; i < 5; ++i)
             {
                 Nodes.Add(new NetInfo.Node());
             }

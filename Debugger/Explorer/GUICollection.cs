@@ -8,14 +8,9 @@ namespace ModTools.Explorer
 {
     internal static class GUICollection
     {
-        public static void OnSceneTreeReflectICollection(SceneExplorerState state, ReferenceChain refChain, object myProperty, TypeUtil.SmartType elementSmartType = TypeUtil.SmartType.Undefined)
+        public static void OnSceneTreeReflectICollection(SceneExplorerState state, ReferenceChain refChain, ICollection collection, TypeUtil.SmartType elementSmartType = TypeUtil.SmartType.Undefined)
         {
             if (!SceneExplorerCommon.SceneTreeCheckDepth(refChain))
-            {
-                return;
-            }
-
-            if (!(myProperty is ICollection collection))
             {
                 return;
             }
@@ -37,7 +32,7 @@ namespace ModTools.Explorer
             var flagsField = collectionItemType?.GetField("m_flags");
             var flagIsEnum = flagsField?.FieldType.IsEnum == true && Type.GetTypeCode(flagsField.FieldType) == TypeCode.Int32;
 
-            GUICollectionNavigation.SetUpCollectionNavigation("Collection", state, refChain, oldRefChain, collectionSize, out var arrayStart, out var arrayEnd);
+            GUICollectionNavigation.SetUpCollectionNavigation("Collection", state, refChain, oldRefChain, (uint)collectionSize, out var arrayStart, out var arrayEnd);
             uint count = 0;
             foreach (var value in collection)
             {
@@ -52,12 +47,10 @@ namespace ModTools.Explorer
                 GUILayout.BeginHorizontal(GUIWindow.HighlightStyle);
                 SceneExplorerCommon.InsertIndent(refChain.Indentation);
 
-                var isNullOrEmpty = value == null || flagIsEnum && Convert.ToInt32(flagsField.GetValue(value)) == 0;
-
                 var type = value?.GetType() ?? collectionItemType;
                 if (type != null)
                 {
-                    if (!isNullOrEmpty)
+                    if (value != null)
                     {
                         GUIExpander.ExpanderControls(state, refChain, type);
                     }
@@ -76,25 +69,21 @@ namespace ModTools.Explorer
                 GUILayout.Label(" = ");
 
                 GUI.contentColor = MainWindow.Instance.Config.ValueColor;
-                GUILayout.Label(value == null ? "null" : isNullOrEmpty ? "empty" : value.ToString());
+                GUILayout.Label(value?.ToString() ?? "null");
 
                 GUI.contentColor = Color.white;
 
                 GUILayout.FlexibleSpace();
 
-                if (!isNullOrEmpty)
-                {
-                    GUIButtons.SetupCommonButtons(refChain, value, count, elementSmartType);
-                }
-
                 if (value != null)
                 {
+                    GUIButtons.SetupCommonButtons(refChain, value, count, elementSmartType);
                     GUIButtons.SetupJumpButton(value, refChain);
                 }
 
                 GUILayout.EndHorizontal();
 
-                if (!isNullOrEmpty && !TypeUtil.IsSpecialType(type) && state.ExpandedObjects.Contains(refChain.UniqueId))
+                if (value != null && !TypeUtil.IsSpecialType(type) && state.ExpandedObjects.Contains(refChain.UniqueId))
                 {
                     GUIReflect.OnSceneTreeReflect(state, refChain, value, false);
                 }

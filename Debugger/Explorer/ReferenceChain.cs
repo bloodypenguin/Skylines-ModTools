@@ -5,6 +5,7 @@ using System.Text;
 using ModTools.Utils;
 using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace ModTools.Explorer {
     internal sealed class ReferenceChain : ICloneable {
@@ -196,16 +197,28 @@ namespace ModTools.Explorer {
                     break;
 
                 case ReferenceType.EnumerableItem:
-                    var collection = current as IEnumerable;
-                    uint currentIndex = 0;
-                    uint index = (uint)chainObjects[i];
-                    foreach (var item in collection) {
-                        if (currentIndex == index) {
-                            current = item;
-                            break;
+                    try {
+                        if (current is Array array) {
+                            long index = Convert.ToInt64(chainObjects[i]);
+                            current = array.GetValue(index);
+                        } else if (current is IList list) {
+                            int index = Convert.ToInt32(chainObjects[i]);
+                            current = list[index];
+                        } else if (current is IEnumerable enumerable) {
+                            ulong index = Convert.ToUInt64(chainObjects[i]);
+                            ulong currentIndex = 0;
+                            foreach (var item in enumerable) {
+                                if (currentIndex == index) {
+                                    current = item;
+                                    break;
+                                }
+                                currentIndex++;
+                            }
+                        } else {
+                            Logger.Error($"'{current?.GetType()}' is not enumerable.");
                         }
-
-                        currentIndex++;
+                    } catch (Exception ex) {
+                        Logger.Exception(ex);
                     }
 
                     break;

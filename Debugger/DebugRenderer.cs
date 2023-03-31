@@ -8,6 +8,7 @@
     using ModTools.Utils;
     using UnityEngine;
     using ModTools.UI;
+    using UnifiedUI.Helpers;
 
     internal sealed class DebugRenderer : MonoBehaviour, IGameObject, IUIObject
     {
@@ -27,6 +28,8 @@
         public bool DrawDebugInfo { get; set; }
 
         private static bool IncludeAll => !MainWindow.Instance.Config.DebugRendererExcludeUninteractive;
+
+        public bool IntoolkeysActrive => hoveredComponent != null;
 
         private List<UIComponent> GetVisibleComponents()
         {
@@ -72,7 +75,7 @@
                 return;
             }
 
-            if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.F))
+            if (SettingsUI.ShowComponentKey.KeyActivated())
             {
                 var refChain = ReferenceChainBuilder.ForUIComponent(hoveredLocal);
 
@@ -85,7 +88,7 @@
                 }
             }
 
-            if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.G) && hoveredComponents.Count > 1 && hoveredComponent != null)
+            if (SettingsUI.IterateComponentKey.KeyActivated() && hoveredComponents.Count > 1 && hoveredComponent != null)
             {
                 var index = hoveredComponents.IndexOf(hoveredComponent);
                 var newIndex = (index + hoveredComponents.Count + 1) % hoveredComponents.Count;

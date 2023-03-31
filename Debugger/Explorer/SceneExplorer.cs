@@ -496,17 +496,25 @@ namespace ModTools.Explorer
 
             state.PreventCircularReferences.Clear();
 
-            lock (ShowRequests)
-            {
-                while (ShowRequests.Count > 0)
-                {
-                    ProcessShowRequest(ShowRequests.Dequeue());
+            if (Event.current.type == EventType.Layout) {
+                FirstFrame = false;
+                lock (ShowRequests) {
+                    while (ShowRequests.Count > 0) {
+                        ProcessShowRequest(ShowRequests.Dequeue());
+                        if (MainWindow.Instance.Config.EvaluateProperties) {
+                            FirstFrame = true;
+                        }
+                    }
                 }
             }
 
-            DrawHeader();
-            DrawSceneTree();
-            DrawComponent();
+            try {
+                DrawHeader();
+                DrawSceneTree();
+                DrawComponent();
+            } catch(Exception ex) {
+                Logger.Exception(ex);
+            }
         }
 
         private static void EnqueueShowRefChainRequest(List<ReferenceChain> refChains, bool hideUnrelatedSceneRoots, string updatedSearchString, bool addChainToHistory)
@@ -519,6 +527,11 @@ namespace ModTools.Explorer
                 AddChainToHistory = addChainToHistory,
             });
         }
+
+        /// <summary>
+        /// avoid exceptions on the first frame when auto-evaluate properties are on.
+        /// </summary>
+        public static bool FirstFrame { get; private set; }
 
         private void ProcessShowRequest(ShowRequest request)
         {
@@ -604,7 +617,7 @@ namespace ModTools.Explorer
                         case ReferenceChain.ReferenceType.EnumerableItem:
                             var index = (uint)refChain.GetChainItem(i);
                             uint startIndex;
-                            if (state.SelectedArrayStartIndices.TryGetValue(expandedRefChain.UniqueId,out startIndex)) {
+                            if (state.SelectedArrayStartIndices.TryGetValue(expandedRefChain.UniqueId, out startIndex)) {
                                 startIndex = Math.Min(index, startIndex);
                             } else if (index > 16) {
                                     startIndex = index - 16;

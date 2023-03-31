@@ -50,6 +50,8 @@ namespace ModTools
             {
                 DebugOutputPanel.AddMessage(ColossalFramework.Plugins.PluginManager.MessageType.Error, s);
             }
+
+            Debug.LogError(s);
         }
 
         public static void Warning(string s)
@@ -86,6 +88,8 @@ namespace ModTools
             {
                 DebugOutputPanel.AddMessage(ColossalFramework.Plugins.PluginManager.MessageType.Error, ex.ToString());
             }
+
+            Debug.LogException(ex);
         }
     }
 }

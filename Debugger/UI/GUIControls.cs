@@ -195,6 +195,7 @@ namespace ModTools.UI
             return result;
         }
 
+        /// <summary> Note: UI does not allow user to enter value that is out of range.</summary>
         public static T NumericValueField<T>(string id, string name, T value)
             where T : struct, IConvertible =>
             (T)NumericValueField(id, name, (object)value);

@@ -72,15 +72,9 @@ namespace ModTools.Utils
         public static bool IsBitmaskEnum(Type t) => t.IsDefined(typeof(FlagsAttribute), false);
 
         public static ExtendedMemberInfo[] GetAllMembers(Type type, bool recursive = false)
-            => GetMembersInternal(type, recursive, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+            => GetMembersInternal(type, recursive, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
         public static void ClearTypeCache() => typeCache = new Dictionary<Type, ExtendedMemberInfo[]>();
-
-        public static bool IsEnumerable(object myProperty)
-        {
-            return typeof(IEnumerable).IsInstanceOfType(myProperty)
-                || typeof(IEnumerable<>).IsInstanceOfType(myProperty);
-        }
 
         public static bool IsCollection(object myProperty)
         {
@@ -122,7 +116,8 @@ namespace ModTools.Utils
                     if (memberName.IndexOf("vehicle", StringComparison.OrdinalIgnoreCase) >= 0 ||
                         memberName.IndexOf("cargo", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        return SmartType.Vehicle;
+                        if (type == typeof(ushort))
+                            return SmartType.Vehicle;
                     }
 
                     if (memberName.IndexOf("buildingNode", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -157,17 +152,20 @@ namespace ModTools.Utils
 
                     if (memberName.IndexOf("node", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        return SmartType.NetNode;
+                        if (type == typeof(ushort))
+                            return SmartType.NetNode;
                     }
 
                     if (memberName.IndexOf("segment", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        return SmartType.NetSegment;
+                        if (type == typeof(ushort))
+                            return SmartType.NetSegment;
                     }
 
                     if (memberName.IndexOf("lane", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        return SmartType.NetLane;
+                        if (type == typeof(uint))
+                            return SmartType.NetLane;
                     }
 
                     if (memberName.IndexOf("park", StringComparison.OrdinalIgnoreCase) >= 0)

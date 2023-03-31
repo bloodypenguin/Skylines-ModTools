@@ -128,6 +128,7 @@ namespace ModTools.Explorer
                                              NetSegment.Flags.Created:
                     InstanceID segmentInst = default;
                     segmentInst.NetSegment = (ushort)valueIndex;
+                    SetupANButton(segmentInst);
                     SetupGotoButton(segmentInst, segment.m_middlePosition);
                     break;
 
@@ -136,12 +137,14 @@ namespace ModTools.Explorer
                                        NetNode.Flags.Created:
                     InstanceID nodeInst = default;
                     nodeInst.NetNode = (ushort)valueIndex;
+                    SetupANButton(nodeInst);
                     SetupGotoButton(nodeInst, node.m_position);
                     break;
 
                 case NetLane lane when valueIndex > 0 &&
                                        ((NetLane.Flags)lane.m_flags & (NetLane.Flags.Created | NetLane.Flags.Deleted)) ==
                                        NetLane.Flags.Created:
+                    SetupANButton(new InstanceID { NetLane = valueIndex });
                     InstanceID segmentInst1 = default;
                     segmentInst1.NetSegment = lane.m_segment;
                     var segment1 = NetManager.instance.m_segments.m_buffer[lane.m_segment];
@@ -316,19 +319,18 @@ namespace ModTools.Explorer
                         break;
                     }
 
-                    case TypeUtil.SmartType.NetNode:
-                    {
+                    case TypeUtil.SmartType.NetNode: {
                         if (Convert.ToUInt16(value) < 1)
                         {
                             return;
                         }
 
-                        if (GUILayout.Button("Show network node"))
+                        ushort nodeId = Convert.ToUInt16(value);
+                        if (GUILayout.Button("node"))
                         {
                             var sceneExplorer = Object.FindObjectOfType<SceneExplorer>();
-                            sceneExplorer.Show(ReferenceChainBuilder.ForNode(Convert.ToUInt16(value)));
+                            sceneExplorer.Show(ReferenceChainBuilder.ForNode(nodeId));
                         }
-
                         break;
                     }
 
@@ -339,12 +341,12 @@ namespace ModTools.Explorer
                             return;
                         }
 
-                        if (GUILayout.Button("Show network segment"))
+                        ushort segmentId = Convert.ToUInt16(value);
+                        if (GUILayout.Button("segment"))
                         {
                             var sceneExplorer = Object.FindObjectOfType<SceneExplorer>();
-                            sceneExplorer.Show(ReferenceChainBuilder.ForSegment(Convert.ToUInt16(value)));
+                            sceneExplorer.Show(ReferenceChainBuilder.ForSegment(segmentId));
                         }
-
                         break;
                     }
 
@@ -355,10 +357,11 @@ namespace ModTools.Explorer
                             return;
                         }
 
-                        if (GUILayout.Button("Show network lane"))
+                        uint laneId = Convert.ToUInt32(value);
+                        if (GUILayout.Button("lane"))
                         {
                             var sceneExplorer = Object.FindObjectOfType<SceneExplorer>();
-                            sceneExplorer.Show(ReferenceChainBuilder.ForLane(Convert.ToUInt32(value)));
+                            sceneExplorer.Show(ReferenceChainBuilder.ForLane(laneId));
                         }
 
                         break;
@@ -589,6 +592,7 @@ namespace ModTools.Explorer
                     break;
 
                 case NetInfo netInfo:
+                    SetupANButton(netInfo);
                     SetupPlopButton(prefabInfo);
                     if (netInfo.m_segments?.Length > 0)
                     {
@@ -741,6 +745,48 @@ namespace ModTools.Explorer
             if (GUILayout.Button("Go to"))
             {
                 ToolsModifierControl.cameraController.SetTarget(instance, position, true);
+            }
+        }
+
+        private static void SetupANButton(InstanceID instance) {
+            switch (instance.Type) {
+                case InstanceType.NetNode:
+                    object nodeAN = ANUtil.GetNodeExt(instance.NetNode);
+                    if (nodeAN != null) {
+                        if (GUILayout.Button("AN node")) {
+                            var sceneExplorer = Object.FindObjectOfType<SceneExplorer>();
+                            sceneExplorer.Show(ANUtil.ForNodeExt(instance.NetNode));
+                        }
+                    }
+                    break;
+                case InstanceType.NetSegment:
+                    object segmentAN = ANUtil.GetSegmentExt(instance.NetSegment);
+                    if (segmentAN != null) {
+                        if (GUILayout.Button("AN segment")) {
+                            var sceneExplorer = Object.FindObjectOfType<SceneExplorer>();
+                            sceneExplorer.Show(ANUtil.ForSegmentExt(instance.NetSegment));
+                        }
+                    }
+                    break;
+                case InstanceType.NetLane:
+                    object laneAN = ANUtil.GetLaneExt(instance.NetLane);
+                    if (laneAN != null) {
+                        if (GUILayout.Button("AN lane")) {
+                            var sceneExplorer = Object.FindObjectOfType<SceneExplorer>();
+                            sceneExplorer.Show(ANUtil.ForLaneExt(instance.NetLane));
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private static void SetupANButton(NetInfo netInfo) {
+            object netInfoExt = ANUtil.GetANNetInfo(netInfo);
+            if (netInfoExt != null) {
+                if (GUILayout.Button("AN Metadata")) {
+                    var sceneExplorer = Object.FindObjectOfType<SceneExplorer>();
+                    sceneExplorer.Show(ANUtil.ForNetInfoExt(netInfo));
+                }
             }
         }
     }
