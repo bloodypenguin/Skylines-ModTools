@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ColossalFramework.UI;
 using UnityEngine;
 
-namespace ModTools
+namespace ModTools.MainObject
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0052", Justification = "Intended for self-reflection in-game")]
     internal sealed class CustomPrefabs : MonoBehaviour, IDestroyableObject, IAwakingObject

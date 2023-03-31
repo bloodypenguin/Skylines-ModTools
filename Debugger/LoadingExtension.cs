@@ -1,4 +1,6 @@
-﻿namespace ModTools {
+﻿using ModTools.MainObject;
+
+namespace ModTools {
     using ColossalFramework;
     using ICities;
     using ModTools.Explorer;
@@ -67,6 +69,7 @@
             TypeUtil.ClearTypeCache();
             ShaderUtil.ClearShaderCache();
             CustomPrefabs.Revert();
+            TransferSearchResults.Revert();
         }
     }
 }

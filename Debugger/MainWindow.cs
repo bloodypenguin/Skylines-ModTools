@@ -1,4 +1,6 @@
-﻿namespace ModTools
+﻿using ModTools.MainObject;
+
+namespace ModTools
 {
     using System;
     using System.Collections.Generic;
@@ -262,6 +264,8 @@
 
             debugRenderer.DrawDebugInfo = GUILayout.Toggle(
                 debugRenderer.DrawDebugInfo, $" Debug Renderer ({SettingsUI.DebugRendererKey})");
+
+            TransferSearchResults.Bootstrap();
 
             var customPrefabsObject = GUILayout.Toggle(Config.CustomPrefabsObject, " ModTools.CustomPrefabs Object");
             if (customPrefabsObject != Config.CustomPrefabsObject)
