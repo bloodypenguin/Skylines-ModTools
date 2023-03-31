@@ -26,6 +26,59 @@ namespace ModTools.Explorer
                     }
 
                     return null;
+                case VehicleInfo vehicleInfo:
+                    if (GUILayout.Button(Ai))
+                    {
+                        return refChain.Add(typeof(VehicleInfo).GetField(nameof(VehicleInfo.m_vehicleAI)));
+                    }
+
+                    SetupButtonsForPrefab(vehicleInfo);
+                    break;
+
+                case BuildingInfo buildingInfo:
+                    if (GUILayout.Button(Ai))
+                    {
+                        return refChain.Add(typeof(BuildingInfo).GetField(nameof(BuildingInfo.m_buildingAI)));
+                    }
+
+                    SetupButtonsForPrefab(buildingInfo);
+                    break;
+
+                case CitizenInfo citizenInfo:
+                    if (GUILayout.Button(Ai))
+                    {
+                        return refChain.Add(typeof(CitizenInfo).GetField(nameof(CitizenInfo.m_citizenAI)));
+                    }
+
+                    SetupButtonsForPrefab(citizenInfo);
+                    break;
+
+                case DisasterInfo disasterInfo:
+                    if (GUILayout.Button(Ai))
+                    {
+                        return refChain.Add(typeof(DisasterInfo).GetField(nameof(DisasterInfo.m_disasterAI)));
+                    }
+
+                    SetupButtonsForPrefab(disasterInfo);
+                    break;
+
+                case EventInfo eventInfo:
+                    if (GUILayout.Button(Ai))
+                    {
+                        return refChain.Add(typeof(EventInfo).GetField(nameof(EventInfo.m_eventAI)));
+                    }
+
+                    SetupButtonsForPrefab(eventInfo);
+                    break;
+
+                case NetInfo netInfo:
+                    if (GUILayout.Button(Ai))
+                    {
+                        return refChain.Add(typeof(NetInfo).GetField(nameof(NetInfo.m_netAI)));
+                    }
+
+                    SetupButtonsForPrefab(netInfo);
+                    break;
 
                 case PrefabInfo prefabInfo:
                     SetupButtonsForPrefab(prefabInfo);
@@ -617,6 +670,7 @@ namespace ModTools.Explorer
             switch (prefabInfo)
             {
                 case VehicleInfoBase vehicleInfoBase:
+
                     SetupMeshPreviewButtons(
                         vehicleInfoBase.name,
                         vehicleInfoBase.m_mesh,
