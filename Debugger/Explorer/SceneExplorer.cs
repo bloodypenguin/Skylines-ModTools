@@ -316,7 +316,7 @@ namespace ModTools.Explorer
 
             if (MainWindow.Instance.Config.SortItemsAlphabetically)
             {
-                Array.Sort(gameObjects, (x, y) => string.CompareOrdinal(x?.name, y?.name));
+                Array.Sort(gameObjects, (x, y) => string.CompareOrdinal(x == null ? null : x.name, y == null ? null : y.name));
             }
 
             if (!sceneTreeArea.Begin())
