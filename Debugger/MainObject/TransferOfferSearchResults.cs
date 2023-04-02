@@ -58,23 +58,63 @@ namespace ModTools.MainObject
                 (TransferManager.TransferOffer[])typeof(TransferManager).GetField("m_incomingOffers",
                         BindingFlags.Instance | BindingFlags.NonPublic)
                     .GetValue(TransferManager.instance);
+            var outgoingCount =
+                (ushort[])typeof(TransferManager).GetField("m_outgoingCount",
+                        BindingFlags.Instance | BindingFlags.NonPublic)
+                    .GetValue(TransferManager.instance);
+            var incomingCount =
+                (ushort[])typeof(TransferManager).GetField("m_incomingCount",
+                        BindingFlags.Instance | BindingFlags.NonPublic)
+                    .GetValue(TransferManager.instance);
+            var incomingAmount =
+                (int[])typeof(TransferManager).GetField("m_incomingAmount",
+                        BindingFlags.Instance | BindingFlags.NonPublic)
+                    .GetValue(TransferManager.instance);
+
             m_instanceID = instanceID;
-            var list = new List<SearchResult>();
-            for (uint index = 0; index < outgoingOffers.Length; index++)
+            var outgoingResults = new List<SearchResult>();
+            var incomingResults = new List<SearchResult>();
+            for (var material = 0; material < incomingAmount.Length; material++)
             {
-                var offer = outgoingOffers[index];
-                if (offer.m_object == instanceID) list.Add(new SearchResult(index, offer));
+                var materialOffset = material * 8;
+
+                for (var priority = 7; priority >= 0; --priority)
+                {
+                    var offerOffset = materialOffset + priority;
+                    for (var offerIndex = 0; offerIndex < outgoingCount[offerOffset]; offerIndex++)
+                    {
+                        var valueIndex = (uint)((offerOffset * 256) + offerIndex);
+                        var offer = outgoingOffers[valueIndex];
+                        if (offer.m_object == instanceID)
+                        {
+                            outgoingResults.Add(new SearchResult(valueIndex, offer));
+                        }
+                    }
+                }
+
+                for (var priority = 7; priority >= 0; --priority)
+                {
+                    var offerOffset = materialOffset + priority;
+                    for (var offerIndex = 0; offerIndex < incomingCount[offerOffset]; offerIndex++)
+                    {
+                        var valueIndex = (uint)((offerOffset * 256) + offerIndex);
+                        var offer = incomingOffers[valueIndex];
+                        if (offer.m_object == instanceID)
+                        {
+                            incomingResults.Add(new SearchResult(valueIndex, offer));
+                        }
+                    }
+                }
             }
 
-            m_outgoingOffers = list.ToArray();
-            var list1 = new List<SearchResult>();
-            for (uint index = 0; index < incomingOffers.Length; index++)
-            {
-                var offer = incomingOffers[index];
-                if (offer.m_object == instanceID) list1.Add(new SearchResult(index, offer));
-            }
+            m_incomingOffers = incomingResults.ToArray();
+            m_outgoingOffers = outgoingResults.ToArray();
 
-            m_incomingOffers = list1.ToArray();
+        }
+
+        public static TransferManager.TransferReason OfferMaterial(uint valueIndex)
+        {
+            return (TransferManager.TransferReason)(valueIndex / 256 / 8);
         }
 
         public struct SearchResult

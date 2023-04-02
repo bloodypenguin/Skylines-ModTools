@@ -401,48 +401,44 @@ namespace ModTools.Explorer
         {
             if (valueIndex > 0)
             {
-                SetupOfferMaterial(valueIndex); // TODO: probably doesn't belong here among buttons
+                GUILayout.Label($"Material: {TransferOfferSearchResults.OfferMaterial(valueIndex)}"); // TODO: probably doesn't belong here among buttons
             }
 
-            if (GUILayout.Button("Go to"))
+            if (!GUILayout.Button("Go to"))
             {
-                var instanceId = new InstanceID();
-                if (transferOffer.Citizen > 0)
-                {
-                    instanceId.Citizen = transferOffer.Citizen;
-                }
-                else if (transferOffer.Building > 0)
-                {
-                    instanceId.Building = transferOffer.Building;
-                }
-                else if (transferOffer.Vehicle > 0)
-                {
-                    instanceId.Vehicle = transferOffer.Vehicle;
-                }
-                else if (transferOffer.NetSegment > 0)
-                {
-                    instanceId.NetSegment = transferOffer.NetSegment;
-                }
-                else if (transferOffer.Park > 0)
-                {
-                    instanceId.Park = transferOffer.Park;
-                }
-                else if (transferOffer.TransportLine > 0)
-                {
-                    instanceId.TransportLine = transferOffer.TransportLine;
-                }
-
-                if (!instanceId.IsEmpty)
-                {
-                    ToolsModifierControl.cameraController.SetTarget(instanceId, transferOffer.Position, true);
-                }
+                return;
             }
-        }
 
-        private static void SetupOfferMaterial(uint valueIndex)
-        {
-            var offerMaterial = (TransferManager.TransferReason)(valueIndex / 256 / 8);
-            GUILayout.Label($"Material: {offerMaterial}");
+            var instanceId = default(InstanceID);
+            if (transferOffer.Citizen > 0)
+            {
+                instanceId.Citizen = transferOffer.Citizen;
+            }
+            else if (transferOffer.Building > 0)
+            {
+                instanceId.Building = transferOffer.Building;
+            }
+            else if (transferOffer.Vehicle > 0)
+            {
+                instanceId.Vehicle = transferOffer.Vehicle;
+            }
+            else if (transferOffer.NetSegment > 0)
+            {
+                instanceId.NetSegment = transferOffer.NetSegment;
+            }
+            else if (transferOffer.Park > 0)
+            {
+                instanceId.Park = transferOffer.Park;
+            }
+            else if (transferOffer.TransportLine > 0)
+            {
+                instanceId.TransportLine = transferOffer.TransportLine;
+            }
+
+            if (!instanceId.IsEmpty)
+            {
+                ToolsModifierControl.cameraController.SetTarget(instanceId, transferOffer.Position, true);
+            }
         }
 
         public static void SetupSmartShowButtons(object value, TypeUtil.SmartType smartType)
@@ -1052,7 +1048,6 @@ namespace ModTools.Explorer
             {
                 return null;
             }
-
             TransferOfferSearchResults.instance.Find(instanceID);
             return new ReferenceChain()
                 .Add(TransferOfferSearchResults.instance.gameObject)
