@@ -1,4 +1,5 @@
 ﻿using System;
+using ColossalFramework;
 using ColossalFramework.UI;
 using ModTools.UI;
 using ModTools.Utils;
@@ -8,16 +9,16 @@ namespace ModTools.Explorer
 {
     internal sealed class MeshViewer : GUIWindow, IGameObject
     {
+
+        private const int RenderResolution = 1080;
         private readonly RenderTexture targetRT;
         private readonly Camera meshViewerCamera;
-        private readonly Light light;
-
         private Mesh previewMesh;
         private Material previewMaterial;
         private string assetName;
 
         private float distance = 4f;
-        private Vector2 previewDir = new Vector2(120f, -20f);
+        private Vector2 previewDir = new (120f, -20f);
         private Bounds bounds;
         private Vector2 lastLeftMousePos = Vector2.zero;
         private Vector2 lastRightMousePos = Vector2.zero;
@@ -29,26 +30,22 @@ namespace ModTools.Explorer
         public MeshViewer()
             : base("Mesh Viewer", new Rect(512, 128, 512, 512))
         {
-            try
-            {
-                light = GameObject.Find("Directional Light").GetComponent<Light>();
-            }
-            catch (Exception)
-            {
-                light = null;
-            }
 
-            meshViewerCamera = gameObject.AddComponent<Camera>();
-            meshViewerCamera.transform.position = new Vector3(-10000.0f, -10000.0f, -10000.0f);
-            meshViewerCamera.fieldOfView = 30f;
-            meshViewerCamera.backgroundColor = Color.grey;
-            meshViewerCamera.nearClipPlane = 1.0f;
-            meshViewerCamera.farClipPlane = 1000.0f;
-            meshViewerCamera.enabled = false;
-            meshViewerCamera.allowHDR = true;
-
-            targetRT = new RenderTexture(512, 512, 24, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
+            // Set up camera.
+            meshViewerCamera = new GameObject("Camera").AddComponent<Camera>();
+            meshViewerCamera.transform.SetParent(transform);
+            targetRT = new RenderTexture(RenderResolution, RenderResolution, 24, RenderTextureFormat.ARGB32);
             meshViewerCamera.targetTexture = targetRT;
+            meshViewerCamera.allowHDR = true;
+            meshViewerCamera.enabled = false;
+            meshViewerCamera.clearFlags = CameraClearFlags.Color;
+
+            // Basic defaults.
+            meshViewerCamera.pixelRect = new Rect(0f, 0f, RenderResolution, RenderResolution);
+            meshViewerCamera.backgroundColor = new Color(0, 0, 0, 0);
+            meshViewerCamera.fieldOfView = 30f;
+            meshViewerCamera.nearClipPlane = 1f;
+            meshViewerCamera.farClipPlane = 1000f;
         }
 
         public static MeshViewer CreateMeshViewer(string assetName, Mesh mesh, Material material, bool calculateBounds = true)
@@ -79,41 +76,83 @@ namespace ModTools.Explorer
                 return;
             }
 
-            var intensity = 0.0f;
-            var color = Color.black;
-            var enabled = false;
+            // Set background.
+            meshViewerCamera.clearFlags = CameraClearFlags.Color;
+            meshViewerCamera.backgroundColor = new Color32(33, 151, 199, 255);
 
-            if (light != null)
-            {
-                intensity = light.intensity;
-                color = light.color;
-                enabled = light.enabled;
-                light.intensity = 2.0f;
-                light.color = Color.white;
-                light.enabled = true;
-            }
+            // Back up current game InfoManager mode.
+            InfoManager infoManager = Singleton<InfoManager>.instance;
+            InfoManager.InfoMode currentMode = infoManager.CurrentMode;
+            InfoManager.SubInfoMode currentSubMode = infoManager.CurrentSubMode;
 
+            // Set current game InfoManager to default (don't want to render with an overlay mode).
+            infoManager.SetCurrentMode(InfoManager.InfoMode.None, InfoManager.SubInfoMode.Default);
+            infoManager.UpdateInfoMode();
+
+            // Backup current exposure and sky tint.
+            float gameExposure = DayNightProperties.instance.m_Exposure;
+            Color gameSkyTint = DayNightProperties.instance.m_SkyTint;
+
+            // Backup current game lighting.
+            Light gameMainLight = RenderManager.instance.MainLight;
+
+            // Set exposure and sky tint for render.
+            DayNightProperties.instance.m_Exposure = 0.75f;
+            DayNightProperties.instance.m_SkyTint = new Color(0, 0, 0);
+            DayNightProperties.instance.Refresh();
+
+            // Set up our render lighting settings.
+            Light renderLight = DayNightProperties.instance.sunLightSource;
+            RenderManager.instance.MainLight = renderLight;
+
+            // Light settings.
+            renderLight.transform.eulerAngles = new Vector3(45f, 180f, 0f);
+            renderLight.intensity = 2f;
+            renderLight.color = Color.white;
+
+            // Set zoom to encapsulate entire model.
             var magnitude = bounds.extents.magnitude;
-            var num1 = magnitude + 16f;
+            var num1 = (magnitude + 16f) * 1.5f;
             var num2 = magnitude * distance;
-            meshViewerCamera.transform.position = -Vector3.forward * num2;
+            meshViewerCamera.transform.position = Vector3.forward * num2;
             meshViewerCamera.transform.rotation = Quaternion.identity;
-            meshViewerCamera.nearClipPlane = Mathf.Max(num2 - num1 * 1.5f, 0.01f);
-            meshViewerCamera.farClipPlane = num2 + num1 * 1.5f;
-            var q = Quaternion.Euler(previewDir.y, 0.0f, 0.0f)
-                           * Quaternion.Euler(0.0f, previewDir.x, 0.0f);
-            var trs = Matrix4x4.TRS(q * -bounds.center, q, Vector3.one);
+            meshViewerCamera.nearClipPlane = Mathf.Max(num2 - num1, 0.01f);
+            meshViewerCamera.farClipPlane = num2 + num1;
+            var q = Quaternion.Euler(previewDir.y, 0f, 0f) * Quaternion.Euler(0f, previewDir.x, 0f);
+            var trs = Matrix4x4.TRS(Vector3.zero, q, Vector3.one);
+
+            // Aim camera at middle of bounds.
+            meshViewerCamera.transform.LookAt(bounds.center);
+
+            // If game is currently in nighttime, enable sun and disable moon lighting.
+            if (gameMainLight == DayNightProperties.instance.moonLightSource)
+            {
+                DayNightProperties.instance.sunLightSource.enabled = true;
+                DayNightProperties.instance.moonLightSource.enabled = false;
+            }
 
             var material1 = (useOriginalShader && material != null) ? material : previewMaterial;
-            Graphics.DrawMesh(previewMesh, trs, material1, 0, meshViewerCamera, 0, null, false, false);
+            Graphics.DrawMesh(previewMesh, trs, material1, 0, meshViewerCamera, 0, null, true, true);
             meshViewerCamera.RenderWithShader(material1.shader, string.Empty);
 
-            if (light != null)
+            // Restore game lighting.
+            RenderManager.instance.MainLight = gameMainLight;
+
+            // Reset to moon lighting if the game is currently in nighttime.
+            if (gameMainLight == DayNightProperties.instance.moonLightSource)
             {
-                light.intensity = intensity;
-                light.color = color;
-                light.enabled = enabled;
+                DayNightProperties.instance.sunLightSource.enabled = false;
+                DayNightProperties.instance.moonLightSource.enabled = true;
             }
+
+            // Restore game exposure and sky tint.
+            DayNightProperties.instance.m_Exposure = gameExposure;
+            DayNightProperties.instance.m_SkyTint = gameSkyTint;
+            DayNightProperties.instance.Refresh();
+
+            // Restore game InfoManager mode.
+            infoManager.SetCurrentMode(currentMode, currentSubMode);
+            infoManager.UpdateInfoMode();
         }
 
         public void Setup(bool calculateBounds)
@@ -136,6 +175,8 @@ namespace ModTools.Explorer
                 bounds = new Bounds(new Vector3(0, 0, 0), new Vector3(3, 3, 3));
             }
 
+            // Expand bounds slightly.
+            bounds.Expand(1f);
             distance = 4f;
         }
 
