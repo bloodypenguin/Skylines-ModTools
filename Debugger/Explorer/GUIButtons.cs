@@ -381,7 +381,7 @@ namespace ModTools.Explorer
                     SetupTransferOffer(transferOffer, valueIndex);
                     break;
                 case TransferOfferSearchResult transferOfferSearchResult:
-                    SetupTransferOffer(transferOfferSearchResult.TransferOffer, transferOfferSearchResult.ValueIndex); // TODO: probably doesn't belong among buttons
+                    SetupTransferOffer(transferOfferSearchResult.TransferOffer, transferOfferSearchResult.ValueIndex);
                     break;
             }
 
