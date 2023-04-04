@@ -6,17 +6,17 @@ using UnityEngine;
 
 namespace ModTools.MainObject
 {
-    public class TransferOfferSearchResults : Singleton<TransferOfferSearchResults>
+    public partial class TransferOfferSearchResults : Singleton<TransferOfferSearchResults>
     {
         private static GameObject thisGameObject;
 
         private InstanceID m_instanceID;
-        private SearchResult[] m_outgoingOffers;
-        private SearchResult[] m_incomingOffers;
+        private TransferOfferSearchResult[] m_outgoingOffers;
+        private TransferOfferSearchResult[] m_incomingOffers;
 
-        public SearchResult[] IncomingOffers() => m_incomingOffers;
+        public TransferOfferSearchResult[] IncomingOffers() => m_incomingOffers;
 
-        public SearchResult[] OutgoingOffers() => m_outgoingOffers;
+        public TransferOfferSearchResult[] OutgoingOffers() => m_outgoingOffers;
 
         public InstanceID InstanceID => m_instanceID;
 
@@ -72,8 +72,8 @@ namespace ModTools.MainObject
                     .GetValue(TransferManager.instance);
 
             m_instanceID = instanceID;
-            var outgoingResults = new List<SearchResult>();
-            var incomingResults = new List<SearchResult>();
+            var outgoingResults = new List<TransferOfferSearchResult>();
+            var incomingResults = new List<TransferOfferSearchResult>();
             for (var material = 0; material < incomingAmount.Length; material++)
             {
                 var materialOffset = material * 8;
@@ -87,7 +87,7 @@ namespace ModTools.MainObject
                         var offer = outgoingOffers[valueIndex];
                         if (offer.m_object == instanceID)
                         {
-                            outgoingResults.Add(new SearchResult(valueIndex, offer));
+                            outgoingResults.Add(new TransferOfferSearchResult(valueIndex, offer));
                         }
                     }
                 }
@@ -101,7 +101,7 @@ namespace ModTools.MainObject
                         var offer = incomingOffers[valueIndex];
                         if (offer.m_object == instanceID)
                         {
-                            incomingResults.Add(new SearchResult(valueIndex, offer));
+                            incomingResults.Add(new TransferOfferSearchResult(valueIndex, offer));
                         }
                     }
                 }
@@ -115,22 +115,6 @@ namespace ModTools.MainObject
         public static TransferManager.TransferReason OfferMaterial(uint valueIndex)
         {
             return (TransferManager.TransferReason)(valueIndex / 256 / 8);
-        }
-
-        public struct SearchResult
-        {
-            private TransferManager.TransferOffer transferOffer;
-            private uint valueIndex;
-
-            public SearchResult(uint valueIndex, TransferManager.TransferOffer transferOffer)
-            {
-                this.valueIndex = valueIndex;
-                this.transferOffer = transferOffer;
-            }
-
-            public TransferManager.TransferOffer TransferOffer => transferOffer;
-
-            public uint ValueIndex => valueIndex;
         }
     }
 }

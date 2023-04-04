@@ -380,8 +380,8 @@ namespace ModTools.Explorer
                 case TransferManager.TransferOffer transferOffer:
                     SetupTransferOffer(transferOffer, valueIndex);
                     break;
-                case TransferOfferSearchResults.SearchResult searchResult:
-                    SetupTransferOffer(searchResult.TransferOffer, searchResult.ValueIndex); // TODO: probably doesn't belong among buttons
+                case TransferOfferSearchResult transferOfferSearchResult:
+                    SetupTransferOffer(transferOfferSearchResult.TransferOffer, transferOfferSearchResult.ValueIndex); // TODO: probably doesn't belong among buttons
                     break;
             }
 
